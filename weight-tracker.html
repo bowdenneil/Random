@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weight Lifting Tracker</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #1a1a2e;
+      color: #e0e0e0;
+      min-height: 100vh;
+      padding: 16px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #00d4ff;
+      font-size: 1.5rem;
+    }
+
+    .container {
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    /* Timer Section */
+    .timer-section {
+      background: #16213e;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+      text-align: center;
+      border: 1px solid #0f3460;
+    }
+
+    .timer-display {
+      font-size: 3rem;
+      font-weight: bold;
+      color: #00d4ff;
+      margin: 10px 0;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .timer-presets {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .timer-presets button {
+      background: #0f3460;
+      color: #e0e0e0;
+      border: 1px solid #1a4a8a;
+      padding: 6px 14px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+
+    .timer-presets button:hover,
+    .timer-presets button.active {
+      background: #00d4ff;
+      color: #1a1a2e;
+      border-color: #00d4ff;
+    }
+
+    .timer-controls {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    }
+
+    .timer-controls button {
+      padding: 10px 24px;
+      border-radius: 8px;
+      border: none;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn-start {
+      background: #00d4ff;
+      color: #1a1a2e;
+    }
+
+    .btn-stop {
+      background: #e94560;
+      color: #fff;
+    }
+
+    .btn-reset {
+      background: #0f3460;
+      color: #e0e0e0;
+      border: 1px solid #1a4a8a;
+    }
+
+    /* Add Exercise */
+    .add-exercise {
+      background: #16213e;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 20px;
+      border: 1px solid #0f3460;
+    }
+
+    .add-exercise h2 {
+      font-size: 1rem;
+      margin-bottom: 12px;
+      color: #00d4ff;
+    }
+
+    .form-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .form-row input {
+      flex: 1;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #0f3460;
+      background: #1a1a2e;
+      color: #e0e0e0;
+      font-size: 0.95rem;
+    }
+
+    .form-row input::placeholder {
+      color: #666;
+    }
+
+    .form-row input[type="number"] {
+      max-width: 80px;
+      text-align: center;
+    }
+
+    .btn-add {
+      width: 100%;
+      padding: 10px;
+      background: #00d4ff;
+      color: #1a1a2e;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn-add:hover {
+      background: #00b8d9;
+    }
+
+    /* Exercise Log */
+    .exercise-log h2 {
+      font-size: 1rem;
+      margin-bottom: 12px;
+      color: #00d4ff;
+    }
+
+    .exercise-card {
+      background: #16213e;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 12px;
+      border: 1px solid #0f3460;
+    }
+
+    .exercise-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .exercise-name {
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .btn-delete {
+      background: none;
+      border: none;
+      color: #e94560;
+      cursor: pointer;
+      font-size: 1.2rem;
+      padding: 4px 8px;
+    }
+
+    .sets-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .sets-table th {
+      text-align: left;
+      padding: 4px 8px;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      color: #888;
+      border-bottom: 1px solid #0f3460;
+    }
+
+    .sets-table td {
+      padding: 6px 8px;
+      font-size: 0.9rem;
+    }
+
+    .sets-table tr:nth-child(even) td {
+      background: rgba(0,0,0,0.15);
+    }
+
+    .set-done {
+      text-decoration: line-through;
+      color: #666;
+    }
+
+    .sets-table .btn-check {
+      background: none;
+      border: 1px solid #0f3460;
+      color: #e0e0e0;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 0.8rem;
+    }
+
+    .sets-table .btn-check.checked {
+      background: #00d4ff;
+      color: #1a1a2e;
+      border-color: #00d4ff;
+    }
+
+    .add-set-row {
+      display: flex;
+      gap: 6px;
+      margin-top: 10px;
+    }
+
+    .add-set-row input {
+      flex: 1;
+      padding: 6px;
+      border-radius: 6px;
+      border: 1px solid #0f3460;
+      background: #1a1a2e;
+      color: #e0e0e0;
+      text-align: center;
+      font-size: 0.85rem;
+    }
+
+    .add-set-row button {
+      padding: 6px 12px;
+      background: #0f3460;
+      color: #e0e0e0;
+      border: 1px solid #1a4a8a;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+
+    .empty-state {
+      text-align: center;
+      color: #666;
+      padding: 30px;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Weight Lifting Tracker</h1>
+
+    <!-- Rest Timer -->
+    <div class="timer-section">
+      <div style="font-size: 0.85rem; color: #888; margin-bottom: 6px;">Rest Timer</div>
+      <div class="timer-presets">
+        <button onclick="setTimer(30)">0:30</button>
+        <button onclick="setTimer(60)" class="active">1:00</button>
+        <button onclick="setTimer(90)">1:30</button>
+        <button onclick="setTimer(120)">2:00</button>
+        <button onclick="setTimer(180)">3:00</button>
+      </div>
+      <div class="timer-display" id="timerDisplay">1:00</div>
+      <div class="timer-controls">
+        <button class="btn-start" id="btnStart" onclick="startTimer()">Start</button>
+        <button class="btn-stop" id="btnStop" onclick="stopTimer()" style="display:none;">Stop</button>
+        <button class="btn-reset" onclick="resetTimer()">Reset</button>
+      </div>
+    </div>
+
+    <!-- Add Exercise -->
+    <div class="add-exercise">
+      <h2>Add Exercise</h2>
+      <div class="form-row">
+        <input type="text" id="exerciseName" placeholder="Exercise name (e.g. Bench Press)">
+      </div>
+      <div class="form-row">
+        <input type="number" id="defaultWeight" placeholder="Weight" min="0">
+        <input type="number" id="defaultReps" placeholder="Reps" min="1" value="10">
+        <input type="number" id="defaultSets" placeholder="Sets" min="1" value="3">
+      </div>
+      <button class="btn-add" onclick="addExercise()">Add Exercise</button>
+    </div>
+
+    <!-- Exercise Log -->
+    <div class="exercise-log">
+      <h2>Workout</h2>
+      <div id="exerciseList">
+        <div class="empty-state">No exercises yet. Add one above to get started.</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // --- Timer ---
+    let timerSeconds = 60;
+    let timerRemaining = 60;
+    let timerInterval = null;
+    let timerRunning = false;
+
+    function formatTime(secs) {
+      const m = Math.floor(secs / 60);
+      const s = secs % 60;
+      return m + ':' + String(s).padStart(2, '0');
+    }
+
+    function setTimer(secs) {
+      timerSeconds = secs;
+      timerRemaining = secs;
+      timerRunning = false;
+      clearInterval(timerInterval);
+      document.getElementById('timerDisplay').textContent = formatTime(secs);
+      document.getElementById('btnStart').style.display = '';
+      document.getElementById('btnStop').style.display = 'none';
+      document.querySelectorAll('.timer-presets button').forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
+    }
+
+    function startTimer() {
+      if (timerRunning) return;
+      timerRunning = true;
+      document.getElementById('btnStart').style.display = 'none';
+      document.getElementById('btnStop').style.display = '';
+      timerInterval = setInterval(() => {
+        timerRemaining--;
+        document.getElementById('timerDisplay').textContent = formatTime(timerRemaining);
+        if (timerRemaining <= 0) {
+          clearInterval(timerInterval);
+          timerRunning = false;
+          document.getElementById('btnStart').style.display = '';
+          document.getElementById('btnStop').style.display = 'none';
+          document.getElementById('timerDisplay').textContent = "0:00";
+          playAlarm();
+        }
+      }, 1000);
+    }
+
+    function stopTimer() {
+      clearInterval(timerInterval);
+      timerRunning = false;
+      document.getElementById('btnStart').style.display = '';
+      document.getElementById('btnStop').style.display = 'none';
+    }
+
+    function resetTimer() {
+      clearInterval(timerInterval);
+      timerRunning = false;
+      timerRemaining = timerSeconds;
+      document.getElementById('timerDisplay').textContent = formatTime(timerSeconds);
+      document.getElementById('btnStart').style.display = '';
+      document.getElementById('btnStop').style.display = 'none';
+    }
+
+    function playAlarm() {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        [0, 0.2, 0.4].forEach(delay => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.frequency.value = 880;
+          osc.type = 'square';
+          gain.gain.value = 0.15;
+          osc.start(ctx.currentTime + delay);
+          osc.stop(ctx.currentTime + delay + 0.15);
+        });
+      } catch (e) {}
+    }
+
+    // --- Exercises ---
+    let exercises = JSON.parse(localStorage.getItem('liftExercises') || '[]');
+
+    function save() {
+      localStorage.setItem('liftExercises', JSON.stringify(exercises));
+    }
+
+    function addExercise() {
+      const name = document.getElementById('exerciseName').value.trim();
+      if (!name) return;
+      const weight = parseFloat(document.getElementById('defaultWeight').value) || 0;
+      const reps = parseInt(document.getElementById('defaultReps').value) || 10;
+      const numSets = parseInt(document.getElementById('defaultSets').value) || 3;
+
+      const sets = [];
+      for (let i = 0; i < numSets; i++) {
+        sets.push({ weight, reps, done: false });
+      }
+
+      exercises.push({ name, sets });
+      save();
+      document.getElementById('exerciseName').value = '';
+      render();
+    }
+
+    function deleteExercise(idx) {
+      exercises.splice(idx, 1);
+      save();
+      render();
+    }
+
+    function toggleSet(exIdx, setIdx) {
+      exercises[exIdx].sets[setIdx].done = !exercises[exIdx].sets[setIdx].done;
+      if (exercises[exIdx].sets[setIdx].done) {
+        resetTimer();
+        startTimer();
+      }
+      save();
+      render();
+    }
+
+    function addSet(exIdx) {
+      const wInput = document.getElementById('addW_' + exIdx);
+      const rInput = document.getElementById('addR_' + exIdx);
+      const w = parseFloat(wInput.value) || 0;
+      const r = parseInt(rInput.value) || 10;
+      exercises[exIdx].sets.push({ weight: w, reps: r, done: false });
+      save();
+      render();
+    }
+
+    function render() {
+      const container = document.getElementById('exerciseList');
+      if (exercises.length === 0) {
+        container.innerHTML = '<div class="empty-state">No exercises yet. Add one above to get started.</div>';
+        return;
+      }
+      container.innerHTML = exercises.map((ex, ei) => {
+        const setsHtml = ex.sets.map((s, si) => `
+          <tr class="${s.done ? 'set-done' : ''}">
+            <td>${si + 1}</td>
+            <td>${s.weight}</td>
+            <td>${s.reps}</td>
+            <td><button class="btn-check ${s.done ? 'checked' : ''}" onclick="toggleSet(${ei},${si})">${s.done ? '\u2713' : ''}</button></td>
+          </tr>
+        `).join('');
+
+        const lastSet = ex.sets[ex.sets.length - 1];
+        return `
+          <div class="exercise-card">
+            <div class="exercise-header">
+              <span class="exercise-name">${ex.name}</span>
+              <button class="btn-delete" onclick="deleteExercise(${ei})">&times;</button>
+            </div>
+            <table class="sets-table">
+              <tr><th>Set</th><th>Weight</th><th>Reps</th><th></th></tr>
+              ${setsHtml}
+            </table>
+            <div class="add-set-row">
+              <input type="number" id="addW_${ei}" placeholder="Wt" value="${lastSet ? lastSet.weight : 0}">
+              <input type="number" id="addR_${ei}" placeholder="Reps" value="${lastSet ? lastSet.reps : 10}">
+              <button onclick="addSet(${ei})">+ Set</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Handle Enter key on exercise name input
+    document.getElementById('exerciseName').addEventListener('keydown', e => {
+      if (e.key === 'Enter') addExercise();
+    });
+
+    render();
+  </script>
+</body>
+</html>
